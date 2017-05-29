@@ -1,0 +1,211 @@
+schema {
+  query: Root
+  mutation: Mutation
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+  id: String!
+  clientMutationId: String
+}
+
+type LoginPayload {
+  user: User
+  clientMutationId: String
+}
+
+input LogoutInput {
+  id: String
+  clientMutationId: String
+}
+
+type LogoutPayload {
+  user: User
+  clientMutationId: String
+}
+
+type Mutation {
+  login(input: LoginInput!): LoginPayload
+  logout(input: LogoutInput!): LogoutPayload
+  updatePomodoro(input: updatePomodoroInput!): updatePomodoroPayload
+}
+
+# An object with an ID
+interface Node {
+  # The id of the object.
+  id: ID!
+}
+
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: String
+
+  # When paginating forwards, the cursor to continue.
+  endCursor: String
+}
+
+type Pomodoro implements Node {
+  # The ID of an object
+  id: ID!
+
+  # user id for current viewer
+  userId: Int
+
+  # the users email address
+  storyId: Int
+
+  # the users first name
+  time: Int
+}
+
+# A connection to a list of items.
+type PomodoroConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [PomodoroEdge]
+}
+
+# An edge in a connection.
+type PomodoroEdge {
+  # The item at the end of the edge
+  node: Pomodoro
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+# A post
+type Project implements Node {
+  # The ID of an object
+  id: ID!
+
+  # The posts creators id
+  projectId: String
+
+  # The posts title
+  title: String
+  stories(after: String, first: Int, before: String, last: Int): StoryConnection
+}
+
+# A connection to a list of items.
+type ProjectConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [ProjectEdge]
+}
+
+# An edge in a connection.
+type ProjectEdge {
+  # The item at the end of the edge
+  node: Project
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+type Root {
+  # Fetches an object given its ID
+  node(
+    # The ID of an object
+    id: ID!
+  ): Node
+  viewer: Viewer
+}
+
+# Story
+type Story implements Node {
+  # The ID of an object
+  id: ID!
+
+  # The posts creators id
+  projectId: String
+
+  # The posts title
+  title: String
+
+  # The posts title
+  storyId: Int
+
+  # The posts title
+  type: String
+
+  # The posts title
+  state: String
+
+  # The posts title
+  owners: [Int]
+
+  # The posts title
+  time: Int
+  pomodoro(after: String, first: Int, before: String, last: Int): PomodoroConnection
+}
+
+# A connection to a list of items.
+type StoryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [StoryEdge]
+}
+
+# An edge in a connection.
+type StoryEdge {
+  # The item at the end of the edge
+  node: Story
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+input updatePomodoroInput {
+  userId: Int!
+  storyId: Int!
+  time: Int!
+  clientMutationId: String
+}
+
+type updatePomodoroPayload {
+  pomodoro: Pomodoro
+  clientMutationId: String
+}
+
+type User implements Node {
+  # The ID of an object
+  id: ID!
+
+  # user id for current viewer
+  userId: String
+
+  # the users email address
+  email: String
+
+  # the users first name
+  username: String
+
+  # the users last name
+  projectsId: [Int]
+
+  # the users role
+  role: String
+  projects(after: String, first: Int, before: String, last: Int): ProjectConnection
+  pomodoro(after: String, first: Int, before: String, last: Int): PomodoroConnection
+}
+
+type Viewer {
+  user: User
+  project(projectId: String): Project
+  pomodoro(projectId: String): Pomodoro
+}
